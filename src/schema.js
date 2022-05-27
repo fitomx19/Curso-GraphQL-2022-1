@@ -20,6 +20,8 @@ const typeDefs = `
     }
     type Mutation{
         createMascota(input: MascotaInput) : Mascotas
+        updateMascota(_id:ID, input: MascotaInput) : Mascotas
+        deleteMascota(_id:ID) : Mascotas
     }
 `;
 
