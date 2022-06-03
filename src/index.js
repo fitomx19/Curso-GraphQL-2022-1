@@ -24,7 +24,7 @@ app.get("/", (req, res) => {
   });
 });
 
-
+//editar mascota
 app.post("/api/editar", (req, res) => {
   let {id,nombre,edad} = req.body;
   edad = parseInt(edad)
@@ -33,7 +33,7 @@ app.post("/api/editar", (req, res) => {
     data:{
       query:
       `
-      mutation( $identificador :ID ){
+      mutation( $identificador :ID , $nombre: String , $edad: Int ){
         updateMascota(_id: $identificador , input:{nombre:$nombre , edad:$edad}){
           nombre
           edad
@@ -50,7 +50,54 @@ app.post("/api/editar", (req, res) => {
   res.redirect("http://localhost:3000/");
 });
 
+//agregar mascota
+app.post("/api/mascota", (req,res) =>{
+  let {nombre,edad} = req.body;
+  console.log(req.body);
+  edad = parseInt(edad);
+  axios('http://localhost:4000/graphl',{
+  method: 'post' , data:  {
+      query:`
+      mutation createMascota( $nombre:String, $edad: Int){
+        createMascota(input:{nombre: $nombre , edad: $edad}){
+          nombre
+          edad
+        }
+      } 
+      ` ,variables:{
+        nombre: nombre,
+        edad:edad,
+      }
+  }
+}).catch((err)=> console.log(err.message));
+res.redirect("http://localhost:3000");
+})
+//eliminar mascota
+app.post("/api/eliminar", (req, res) => {
+  let {id} = req.body;
+ 
+  axios('http://localhost:4000/graphl',{
+    method:'post',
+    data:{
+      query:
+      `
+      mutation( $identificador :ID ){
+        deleteMascota(_id: $identificador){
+          nombre
+          edad
+        }
+      }
+      `,
+      variables:{
+        identificador:id
+      }
+    }
+  }).catch((err) => console.log(err.message));
+  res.redirect("http://localhost:3000/");
+});
 
+
+//servidor graphql
 app.use(
   "/graphl",
   graphqlHTTP({
